@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
@@ -13,6 +12,8 @@ import (
 	"github.com/target/flottbot/utils"
 )
 
+const configPath = "config/rules"
+
 // Rules - searches the rules directory for any existing .yml rules
 // and proceeds to create Rule objects for each .yml rule,
 // and then finally populates a rules map with said Rule objects.
@@ -20,15 +21,11 @@ import (
 func Rules(rules *map[string]models.Rule, bot *models.Bot) {
 	// Check if the rules directory even exists
 	bot.Log.Debug("Looking for rules directory...")
-	searchDir, err := utils.PathExists(path.Join("config", "rules"))
-	if err != nil {
-		bot.Log.Fatalf("Could not parse rules: %v", err)
-	}
-
+	searchDir := configPath
 	// Loop through the rules directory and create a list of rules
 	bot.Log.Debug("Fetching all rule files...")
 	fileList := []string{}
-	err = filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
+	err := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
 		if !f.IsDir() {
 			fileList = append(fileList, path)
 		}
